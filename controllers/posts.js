@@ -15,3 +15,11 @@ module.exports = (app) => {
   });
 
 };
+
+Post.find({})
+  .then(posts => {
+    res.render("posts-index", { posts });
+  })
+  .catch(err => {
+    console.log(err.message);
+  });
