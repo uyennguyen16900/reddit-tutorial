@@ -8,7 +8,7 @@ mongoose.connect(
   "mongodb://localhost/reddit-db",
  { useNewUrlParser: true }
 );
-);
+
 mongoose.connection.on("error", console.error.bind(console, "MongoDB connection Error:"));
 
 // display debug info from Mongoose in the console

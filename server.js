@@ -1,5 +1,5 @@
 const express = require('express')
-const port = 3000
+// const port = 3000
 const exphbs  = require('express-handlebars');
 const dotenv = require('dotenv')
 const bodyParser = require('body-parser');
@@ -19,12 +19,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 
 
-app.get('/posts/new')
 
 
 const postController = require('./controllers/posts');
 
+// routes
+app.get('/posts/new')
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+app.listen(process.env.PORT, () => console.log(`Listening at http://localhost:${process.env.PORT}`));
 
 module.exports = app;
