@@ -1,36 +1,46 @@
-const Post = require('../models/post');
+const Post = require('../models/Post');
 
-module.exports = (app) => {
 
-  // CREATE
-  app.post('/posts/new', (req, res) => {
-    // INSTANTIATE INSTANCE OF POST MODEL
-    const post = new Post(req.body);
-
-    // SAVE INSTANCE OF POST MODEL TO DB
-    post.save((err, post) => {
-      // REDIRECT TO THE ROOT
-      return res.redirect(`/`);
-    })
-  });
-
+// GET POST FORM
+exports.getNewPostForm = (req, res) => {
+  res.render('posts-new', {
+    pageTitle: "New Post",
+    postsNewActive: true
+  })
 };
 
-Post.find({})
-  .then(posts => {
-    res.render("posts-index", { posts });
+// CREATE POST
+exports.postNewPost = (req, res) => {
+  const post = new Post(req.body);
+  post.save((err, post) => {
+    return res.redirect('/');
+  })
+};
+
+// GET SINGLE POST
+exports.getPost = (req, res) => {
+  Post.findById(req.params.id).populate('comments')
+  .then(post => {
+    res.render("posts-show", {
+      pageTitle: post.title,
+      post: JSON.parse(JSON.stringify(post))
+    });
   })
   .catch(err => {
     console.log(err.message);
   });
+};
 
-app.get("/posts/:id", function(req, res) {
-  // LOOK UP THE POST
-  Post.findById(req.params.id)
-    .then(post => {
-      res.render("posts-show", { post });
+// GET POSTS BY SUBREDDIT
+exports.getSubReddit = (req, res) => {
+  Post.find({ subreddit: req.params.subreddit })
+    .then(posts => {
+      res.render("posts-index", {
+        pageTitle: req.params.subreddit,
+        posts: JSON.parse(JSON.stringify(posts))
+       });
     })
     .catch(err => {
-      console.log(err.message);
+      console.log(err);
     });
-});
+};
