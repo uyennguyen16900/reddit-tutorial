@@ -1,6 +1,6 @@
 const express = require('express')
 const exphbs  = require('express-handlebars');
-const dotenv = require('dotenv').config();
+const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 
