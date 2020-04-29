@@ -13,6 +13,7 @@ const app = express()
 // Set db
 require('./data/reddit-db');
 
+dotenv.config({ path: '.env' });
 
 // Middleware
 app.engine('handlebars', exphbs());
@@ -27,7 +28,7 @@ app.use(cookieParser()); // Add this after you initialize express.
 const homeController = require('./controllers/home')
 const postController = require('./controllers/posts');
 const commentController = require('./controllers/comments');
-// const authController = require('./controllers/auth.js');
+// const authController = require('./controllers/auth');
 require('./controllers/auth.js')(app);
 
 
