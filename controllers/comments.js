@@ -4,7 +4,7 @@ const Comment = require('../models/Comment');
 module.exports = (app) => {
     app.post('/posts/:postId/comments', (req, res) => {
         const comment = new Comment(req.body);
-        comment.author = req.user
+        comment.author = req.user._id;
 
         comment.save()
             .then(comment => {
