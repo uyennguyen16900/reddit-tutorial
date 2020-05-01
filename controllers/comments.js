@@ -1,25 +1,24 @@
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 
+module.exports = (app) => {
+    app.post('/posts/:postId/comments', (req, res) => {
+        const comment = new Comment(req.body);
+        comment.author = req.user
 
-exports.postNewComment = (req, res) => {
-  // INSTANTIATE INSTANCE OF MODEL
-  const comment = new Comment(req.body);
-
-  // SAVE INSTANCE OF Comment MODEL TO DB
-  comment
-    .save()
-    .then(comment => {
-      return Post.findById(req.params.postId);
+        comment.save()
+            .then(comment => {
+                return Post.findById(req.params.postId)
+            })
+            .then(post => {
+                post.comments.unshift(comment);
+                return post.save();
+            })
+            .then(post => {
+                return res.redirect('/');
+            })
+            .catch(err => {
+                console.log(err);
+            })
     })
-    .then(post => {
-      post.comments.unshift(comment);
-      return post.save();
-    })
-    .then(post => {
-      res.redirect(`/`);
-    })
-    .catch(err => {
-      console.log(err);
-    });
 };

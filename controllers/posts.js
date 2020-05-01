@@ -1,46 +1,76 @@
 const Post = require('../models/Post');
 
 
-// GET POST FORM
-exports.getNewPostForm = (req, res) => {
-  res.render('posts-new', {
-    pageTitle: "New Post",
-    postsNewActive: true
-  })
-};
+module.exports = (app) => {
+    app.get('/posts/new', (req, res) => {
+        var currentUser = req.user;
 
-// CREATE POST
-exports.postNewPost = (req, res) => {
-  const post = new Post(req.body);
-  post.save((err, post) => {
-    return res.redirect('/');
-  })
-};
-
-// GET SINGLE POST
-exports.getPost = (req, res) => {
-  Post.findById(req.params.id).populate('comments')
-  .then(post => {
-    res.render("posts-show", {
-      pageTitle: post.title,
-      post: JSON.parse(JSON.stringify(post))
-    });
-  })
-  .catch(err => {
-    console.log(err.message);
-  });
-};
-
-// GET POSTS BY SUBREDDIT
-exports.getSubReddit = (req, res) => {
-  Post.find({ subreddit: req.params.subreddit })
-    .then(posts => {
-      res.render("posts-index", {
-        pageTitle: req.params.subreddit,
-        posts: JSON.parse(JSON.stringify(posts))
-       });
+        res.render('posts-new', { currentUser })
     })
-    .catch(err => {
-      console.log(err);
+
+    app.post('/posts/new', (req, res) => {
+        console.log("Submitting post")
+        if(req.user){
+            const post = new Post(req.body);
+            post.author = req.user
+
+            console.log("User is not null")
+
+            post.save()
+            .then(post => {
+                return User.findById(req.user._id)
+            })
+            .then(user => {
+                console.log(`User id: ${req.user._id}`)
+                user.posts.unshift(post);
+                user.save()
+                res.redirect(`/posts/${post._id}`)
+            })
+            .catch(err => {
+                console.log("Error!")
+                console.log(err.message);
+            })
+        }else{
+            console.log("User is not authorized")
+            res.sendStatus(401); // Unauthorized!
+        }
+    });
+
+    app.get('/', (req, res) => {
+        var currentUser = req.user;
+
+        Post.find().populate('author').lean()
+            .then(posts => {
+                res.render("posts-index", { posts, currentUser });
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    })
+
+    app.get("/posts/:id", function(req, res) {
+        var currentUser = req.user;
+
+        Post.findById(req.params.id).populate({path:'comments', populate: {path: 'author'}}).populate('author').lean()
+        .then(post => {
+            res.render("posts-show", { post, currentUser });
+        })
+        .catch(err => {
+            console.log(err.message);
+        });
+    });
+
+
+    // SUBREDDIT
+    app.get("/n/:subreddit", function(req, res) {
+        var currentUser = req.user;
+
+        Post.find({ subreddit: req.params.subreddit }).populate('author').lean()
+          .then(posts => {
+            res.render("posts-index", { posts, currentUser });
+          })
+          .catch(err => {
+            console.log(err);
+          });
     });
 };

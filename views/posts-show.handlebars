@@ -1,5 +1,6 @@
 <div class="col-sm-6 offset-sm-3 mt-4">
   <a href="{{post.url}}" class="lead">{{post.title}}</a>
+  <div><small>By: {{post.author.username}}</small></div>
   <p>{{post.summary}}</p>
   <form action="/posts/{{post._id}}/comments" method="post">
     <textarea class='form-control' name="content" placeholder="Comment"></textarea>
