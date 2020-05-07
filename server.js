@@ -34,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 app.use(cookieParser()); // Add this after you initialize express.
+app.use(express.static('public'));
 
 require('./controllers/posts')(app);
 require('./controllers/comments.js')(app);
