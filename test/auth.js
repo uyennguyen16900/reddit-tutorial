@@ -7,7 +7,11 @@ chai.use(chaiHttp);
 // Agent that will keep track of our cookies
 const agent = chai.request.agent(server);
 
-const User = require("../models/user");
+const User = require("../models/User");
+
+after(function () {
+  agent.close()
+});
 
 describe("User", function() {
   // TESTS WILL GO HERE.
@@ -53,8 +57,6 @@ describe("User", function() {
       done();
     });
   });
-  
-  after(function () {
-    agent.close()
-  });
+
+
 });

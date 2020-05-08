@@ -1,6 +1,6 @@
-var Post = require("../models/post");
-var Comment = require("../models/comment");
-var User = require("../models/user");
+var Post = require("../models/Post");
+var Comment = require("../models/Comment");
+var User = require("../models/User");
 
 module.exports = app => {
   // NEW REPLY
