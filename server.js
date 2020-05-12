@@ -1,54 +1,57 @@
 const express = require('express')
-const exphbs  = require('express-handlebars');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
-const expressValidator = require('express-validator');
-const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-
-
-// App setup
 const app = express()
+const port = 3000
+const bodyParser = require('body-parser')
+const expressValidator = require('express-validator')
+require('dotenv').config()
 
 // Set db
-dotenv.config({ path: '.env' });
+require('./data/reddit-db')
 
 // Middleware
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
+const exphbs = require('express-handlebars')
+var cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
+
+app.use(express.static('public'))
+
+app.use(cookieParser()) // Add this after you initialize express.
+
+// Use Body Parser
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// Add after body parser initialization!
+app.use(expressValidator())
 
 var checkAuth = (req, res, next) => {
-  console.log("Checking authentication");
-  if (typeof req.cookies.nToken === "undefined" || req.cookies.nToken === null) {
-      console.log("Cookie nToken undefined")
-      req.user = null;
+  console.log('Checking authentication')
+  if (typeof req.cookies.nToken === 'undefined' || req.cookies.nToken === null) {
+    req.user = null
   } else {
-    var token = req.cookies.nToken;
-    var decodedToken = jwt.decode(token, { complete: true }) || {};
-    console.log("Cookie nToken IS defined: " + decodedToken.payload)
-    req.user = decodedToken.payload;
+    var token = req.cookies.nToken
+    var decodedToken = jwt.decode(token, { complete: true }) || {}
+    req.user = decodedToken.payload
   }
 
-  next();
-};
+  next()
+}
+app.use(checkAuth)
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(expressValidator());
-app.use(cookieParser()); // Add this after you initialize express.
-app.use(checkAuth);
-app.use(express.static('public'));
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
+app.set('view engine', 'handlebars')
 
+// app.get('/', (req, res) => res.render('posts-index'))
 
-require('./controllers/posts.js')(app);
-require('./controllers/comments.js')(app);
-require('./controllers/auth.js')(app);
-require('./data/reddit-db');
-require('./controllers/replies.js')(app);
+app.get('/posts/new', (req, res) => res.render('posts-new', { currentUser: req.user }))
 
-// app.listen(process.env.PORT, () => console.log(`Listening at http://localhost:${process.env.PORT}`));
-app.listen(3000, () => {
-    console.log('Reddit listening on port localhost:3000!');
-});
+require('./controllers/posts')(app)
+require('./controllers/comments.js')(app)
+require('./controllers/auth.js')(app)
+require('./controllers/replies.js')(app)
 
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:3000`)
+})
+
+module.exports = app

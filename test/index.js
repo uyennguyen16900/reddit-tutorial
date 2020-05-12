@@ -1,25 +1,27 @@
-const app = require("./../server");
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const should = chai.should();
+const app = require('./../server')
+const chai = require('chai')
+const mocha = require('mocha')
+const chaiHttp = require('chai-http')
+const should = chai.should()
+const it = mocha.it
+const describe = mocha.describe
 
-chai.use(chaiHttp);
+chai.use(chaiHttp)
 
-// using arrow function is discouraged in Mocha
-describe("site", function() {
+describe('site', function () {
   // Describe what you are testing
-  it("Should have home page", function(done) {
+  it('Should have home page', function (done) {
     // Describe what should happen
     // In this case we test that the home page loads
     chai
       .request(app)
-      .get("/")
-      .end(function(err, res) {
+      .get('/')
+      .end(function (err, res) {
         if (err) {
-          return done(err);
+          return done(err)
         }
-        res.status.should.be.equal(200);
-        return done(); // Call done if the test completed successfully.
-      });
-  });
-});
+        res.status.should.be.equal(200)
+        return done() // Call done if the test completed successfully.
+      })
+  })
+})
